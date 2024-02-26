@@ -125,6 +125,14 @@ let make = (~children, ~paymentMode, ~setIntegrateErrorError, ~logger) => {
     handlePostMessage([("iframeMounted", true->Js.Json.boolean)])
     handlePostMessage([("applePayMounted", true->Js.Json.boolean)])
     logger.setLogInitiated()
+    switch paymentlist {
+    | Loaded(_)
+    | LoadError => ()
+    | _ =>
+      setList(._ =>
+        showCardFormByDefault && Utils.checkPriorityList(paymentMethodOrder) ? SemiLoaded : Loading
+      )
+    }
     Window.addEventListener("click", ev =>
       handleOnClickPostMessage(~targetOrigin=keys.parentURL, ev)
     )
@@ -246,12 +254,13 @@ let make = (~children, ~paymentMode, ~setIntegrateErrorError, ~logger) => {
                 }
               }
 
-              logger.setLogInfo(~value="paymentElementCreate", ~eventName=APP_RENDERED, ())
+              logger.setLogInfo(~value=Window.href, ~eventName=APP_RENDERED, ())
               [
                 ("iframeId", "no-element"->Js.Json.string),
                 ("publishableKey", ""->Js.Json.string),
                 ("parentURL", "*"->Js.Json.string),
                 ("sdkHandleConfirmPayment", false->Js.Json.boolean),
+                ("sdkHandleOneClickConfirmPayment", true->Js.Json.boolean),
               ]->Js.Array2.forEach(keyPair => {
                 dict->CommonHooks.updateKeys(keyPair, setKeys)
               })
@@ -332,10 +341,16 @@ let make = (~children, ~paymentMode, ~setIntegrateErrorError, ~logger) => {
         if dict->getDictIsSome("paymentMethodList") {
           let list = dict->getJsonObjectFromDict("paymentMethodList")
           list == Js.Dict.empty()->Js.Json.object_
-            ? setList(._ => LoadError(Js.Dict.empty()->Js.Json.object_))
+            ? setList(._ => LoadError)
             : switch list->Utils.getDictFromJson->Js.Dict.get("error") {
-              | Some(err) => setList(._ => LoadError(err))
-              | None => setList(._ => Loaded(list))
+              | Some(_) => setList(._ => LoadError)
+              | None =>
+                let isNonEmptyPaymentMethodList =
+                  list
+                  ->Utils.getDictFromJson
+                  ->Utils.getArray("payment_methods")
+                  ->Js.Array2.length > 0
+                setList(._ => isNonEmptyPaymentMethodList ? Loaded(list) : LoadError)
               }
         }
         if dict->getDictIsSome("customerPaymentMethods") {
@@ -357,18 +372,6 @@ let make = (~children, ~paymentMode, ~setIntegrateErrorError, ~logger) => {
     }
     handleMessage(handleFun, "Error in parsing sent Data")
   }, (showCardFormByDefault, paymentMethodOrder))
-
-  React.useEffect1(() => {
-    switch paymentlist {
-    | Loaded(_)
-    | LoadError(_) => ()
-    | _ =>
-      setList(._ =>
-        showCardFormByDefault && Utils.checkPriorityList(paymentMethodOrder) ? SemiLoaded : Loading
-      )
-    }
-    None
-  }, [paymentlist])
 
   let observer = ResizeObserver.newResizerObserver(entries => {
     entries

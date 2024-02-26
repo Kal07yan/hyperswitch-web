@@ -20,7 +20,6 @@ let make = (
   )
   let isApplePayReady = Recoil.useRecoilValueFromAtom(isApplePayReady)
   let isGooglePayReady = Recoil.useRecoilValueFromAtom(isGooglePayReady)
-  let pmList = Recoil.useRecoilValueFromAtom(list)
   let methodslist = Recoil.useRecoilValueFromAtom(list)
   let paymentOrder = paymentMethodOrder->Utils.getOptionalArr->Utils.removeDuplicate
   let (sessions, setSessions) = React.useState(_ => Js.Dict.empty()->Js.Json.object_)
@@ -91,6 +90,7 @@ let make = (
             )
           }
         : ()
+    | LoadError
     | SemiLoaded =>
       setPaymentOptions(_ =>
         showCardFormByDefault && Utils.checkPriorityList(paymentMethodOrder) ? ["card"] : []
@@ -143,7 +143,7 @@ let make = (
         ? ""
         : switch methodslist {
           | SemiLoaded
-          | LoadError(_) =>
+          | LoadError =>
             showCardFormByDefault && Utils.checkPriorityList(paymentMethodOrder) ? "card" : ""
           | Loaded(_) =>
             paymentOptions->Js.Array2.includes(selectedOption) && showCardFormByDefault
@@ -319,8 +319,8 @@ let make = (
       </RenderIf>
       <PoweredBy />
     </RenderIf>
-    {switch pmList {
-    | LoadError(_) => React.null
+    {switch methodslist {
+    | LoadError => React.null
     | _ =>
       <RenderIf
         condition={paymentOptions->Js.Array2.length == 0 && walletOptions->Js.Array2.length == 0}>

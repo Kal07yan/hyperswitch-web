@@ -1,3 +1,166 @@
+# [0.25.0](https://github.com/juspay/hyperswitch-web/compare/v0.24.0...v0.25.0) (2024-02-19)
+
+
+### Features
+
+* HS-132: Language Support for Error Messages ([#173](https://github.com/juspay/hyperswitch-web/issues/173)) ([281279c](https://github.com/juspay/hyperswitch-web/commit/281279c773f757e3c361f8e068b4d24a24028e42))
+* moved Issues from Jira to Github ([#138](https://github.com/juspay/hyperswitch-web/issues/138)) ([5b42603](https://github.com/juspay/hyperswitch-web/commit/5b426034ca13a75eafb282e4de09a402b5c91636))
+
+# [0.24.0](https://github.com/juspay/hyperswitch-web/compare/v0.23.12...v0.24.0) (2024-02-19)
+
+
+### Features
+
+* Logging framework revamped ([#167](https://github.com/juspay/hyperswitch-web/issues/167)) ([6ecbadd](https://github.com/juspay/hyperswitch-web/commit/6ecbaddad644b50d6225516f4dd5df5403e5d9ba))
+
+## [0.23.12](https://github.com/juspay/hyperswitch-web/compare/v0.23.11...v0.23.12) (2024-02-19)
+
+
+### Bug Fixes
+
+* Handling error cases for payment methods list ([#164](https://github.com/juspay/hyperswitch-web/issues/164)) ([8df24df](https://github.com/juspay/hyperswitch-web/commit/8df24df92e9fa488ad81fb27709cbffe12a6bef6))
+
+## [0.23.11](https://github.com/juspay/hyperswitch-web/compare/v0.23.10...v0.23.11) (2024-02-16)
+
+
+### Bug Fixes
+
+* HS-222: Address line2 optional in case of isUseBillingAddress ([#174](https://github.com/juspay/hyperswitch-web/issues/174)) ([d2fa10e](https://github.com/juspay/hyperswitch-web/commit/d2fa10e3c9e48bb8c9488cc3fcf044b7c05dd301))
+
+## [0.23.10](https://github.com/juspay/hyperswitch-web/compare/v0.23.9...v0.23.10) (2024-02-16)
+
+
+### Bug Fixes
+
+* HS-148: Added Currency with surcharge amount ([#146](https://github.com/juspay/hyperswitch-web/issues/146)) ([ceadf3e](https://github.com/juspay/hyperswitch-web/commit/ceadf3e8bb1845058504884940c5d5573bda2dbf))
+
+## [0.23.9](https://github.com/juspay/hyperswitch-web/compare/v0.23.8...v0.23.9) (2024-02-16)
+
+
+### Bug Fixes
+
+* HS-132: Error handling for Address Fields ([#171](https://github.com/juspay/hyperswitch-web/issues/171)) ([38f3a79](https://github.com/juspay/hyperswitch-web/commit/38f3a79552f10e6712d2402475d44a70aba46e41))
+
+## [0.23.8](https://github.com/juspay/hyperswitch-web/compare/v0.23.7...v0.23.8) (2024-02-15)
+
+
+### Bug Fixes
+
+* HS-111: Added billing name to address element ([#145](https://github.com/juspay/hyperswitch-web/issues/145)) ([426415a](https://github.com/juspay/hyperswitch-web/commit/426415a8c88e56bd0e6b84da56982c1e40082c67))
+
+## [0.23.7](https://github.com/juspay/hyperswitch-web/compare/v0.23.6...v0.23.7) (2024-02-13)
+
+
+### Bug Fixes
+
+* Payment Dropdown multiple render fix ([#166](https://github.com/juspay/hyperswitch-web/issues/166)) ([56e8cb3](https://github.com/juspay/hyperswitch-web/commit/56e8cb311301fb26d415e87af639b58cfa090080))
+
+## [0.23.6](https://github.com/juspay/hyperswitch-web/compare/v0.23.5...v0.23.6) (2024-02-13)
+
+
+### Bug Fixes
+
+* HS-2222: Validation failing for Billing details ([#165](https://github.com/juspay/hyperswitch-web/issues/165)) ([2c1754d](https://github.com/juspay/hyperswitch-web/commit/2c1754df5cf90b37c897bf03de11b79d6eb3bb32))
+
+## [0.23.5](https://github.com/juspay/hyperswitch-web/compare/v0.23.4...v0.23.5) (2024-02-13)
+
+
+### Bug Fixes
+
+* HS-202: ApplePay Dynamic Fields Error Handling ([#159](https://github.com/juspay/hyperswitch-web/issues/159)) ([ad97f2d](https://github.com/juspay/hyperswitch-web/commit/ad97f2da1bd83132f1a97590154f650a283f8aea))
+
+## [0.23.4](https://github.com/juspay/hyperswitch-web/compare/v0.23.3...v0.23.4) (2024-02-13)
+
+
+### Bug Fixes
+
+* HS-1223: updated codeowners ([#142](https://github.com/juspay/hyperswitch-web/issues/142)) ([ff29a20](https://github.com/juspay/hyperswitch-web/commit/ff29a209958df1c27f4384652500c4e52cefb97c))
+* HS-234: Added support for few more countries ([#160](https://github.com/juspay/hyperswitch-web/issues/160)) ([4bac3aa](https://github.com/juspay/hyperswitch-web/commit/4bac3aa238f5d986b730801cc117e8980c42e66f))
+
+## [0.23.3](https://github.com/juspay/hyperswitch-web/compare/v0.23.2...v0.23.3) (2024-02-13)
+
+
+### Bug Fixes
+
+* HS-167: Changed name and icon for Open Banking Uk ([#156](https://github.com/juspay/hyperswitch-web/issues/156)) ([4b33231](https://github.com/juspay/hyperswitch-web/commit/4b33231c0ee1689f77da0c5e5e20f88f0ade5c37))
+* HS-187: Improve UI qr code display for PIX ([#149](https://github.com/juspay/hyperswitch-web/issues/149)) ([1cf448b](https://github.com/juspay/hyperswitch-web/commit/1cf448b5e0e4d0124ff34aed818f44dfb75e9cf5))
+
+## [0.23.2](https://github.com/juspay/hyperswitch-web/compare/v0.23.1...v0.23.2) (2024-02-12)
+
+
+### Bug Fixes
+
+* HS-1111: fixed addres state ([#151](https://github.com/juspay/hyperswitch-web/issues/151)) ([a91cfd9](https://github.com/juspay/hyperswitch-web/commit/a91cfd9ab2331760032221d732e92b02a4b40750))
+
+## [0.23.1](https://github.com/juspay/hyperswitch-web/compare/v0.23.0...v0.23.1) (2024-02-12)
+
+
+### Bug Fixes
+
+* HS-2222: Missing Address state ([#150](https://github.com/juspay/hyperswitch-web/issues/150)) ([fd10795](https://github.com/juspay/hyperswitch-web/commit/fd107951beedc82d83a0688a1ae7df86c4bf7c12))
+
+# [0.23.0](https://github.com/juspay/hyperswitch-web/compare/v0.22.5...v0.23.0) (2024-02-11)
+
+
+### Features
+
+* Added masked payload for confirm calls ([#148](https://github.com/juspay/hyperswitch-web/issues/148)) ([e3fe10d](https://github.com/juspay/hyperswitch-web/commit/e3fe10d1d8b63d1b1ce2f4cdc8901384ba6cdb91))
+
+## [0.22.5](https://github.com/juspay/hyperswitch-web/compare/v0.22.4...v0.22.5) (2024-02-07)
+
+
+### Bug Fixes
+
+* HS-132: Fixed multiple re render ([#144](https://github.com/juspay/hyperswitch-web/issues/144)) ([8ffa095](https://github.com/juspay/hyperswitch-web/commit/8ffa095b52e45fd3804b4b416f58e4706746cb45))
+
+## [0.22.4](https://github.com/juspay/hyperswitch-web/compare/v0.22.3...v0.22.4) (2024-02-05)
+
+
+### Bug Fixes
+
+* HS-1111: invalid country options ([#141](https://github.com/juspay/hyperswitch-web/issues/141)) ([4198ace](https://github.com/juspay/hyperswitch-web/commit/4198ace098b32bfecb810e99db966f62833b2428))
+
+## [0.22.3](https://github.com/juspay/hyperswitch-web/compare/v0.22.2...v0.22.3) (2024-02-05)
+
+
+### Bug Fixes
+
+* HS-111: Fix: Empty/Invalid Country Varient /confirm call ([#137](https://github.com/juspay/hyperswitch-web/issues/137)) ([ad0ef72](https://github.com/juspay/hyperswitch-web/commit/ad0ef72f3652375d1e255f44427e317ad1ea84e4))
+* HS-132: Dynamic Fields fix for email ([#139](https://github.com/juspay/hyperswitch-web/issues/139)) ([10dc77a](https://github.com/juspay/hyperswitch-web/commit/10dc77a8eb72c437703ccfbdf60c8e99ec0c8df1))
+
+## [0.22.2](https://github.com/juspay/hyperswitch-web/compare/v0.22.1...v0.22.2) (2024-02-02)
+
+
+### Bug Fixes
+
+* HS-111: Fix: Card cvc for saved cards empty (blocking confirm) ([#135](https://github.com/juspay/hyperswitch-web/issues/135)) ([d710cd7](https://github.com/juspay/hyperswitch-web/commit/d710cd787bc33b3233d7dcdae29cef32b8cba47f))
+
+## [0.22.1](https://github.com/juspay/hyperswitch-web/compare/v0.22.0...v0.22.1) (2024-02-01)
+
+
+### Bug Fixes
+
+* HS-187: Added pix svg icon ([#134](https://github.com/juspay/hyperswitch-web/issues/134)) ([7b2e4c5](https://github.com/juspay/hyperswitch-web/commit/7b2e4c511ba831c9a15fa76092b7a431274d0bec))
+
+# [0.22.0](https://github.com/juspay/hyperswitch-web/compare/v0.21.0...v0.22.0) (2024-02-01)
+
+
+### Features
+
+* HS-187: Added Pix Bank Transfer ([#129](https://github.com/juspay/hyperswitch-web/issues/129)) ([3ea2e03](https://github.com/juspay/hyperswitch-web/commit/3ea2e0387fd34029308368ea8f068cf9d336a716))
+
+# [0.21.0](https://github.com/juspay/hyperswitch-web/compare/v0.20.5...v0.21.0) (2024-02-01)
+
+
+### Bug Fixes
+
+* HS-12344: Email fields empty for saved cards flow ([#127](https://github.com/juspay/hyperswitch-web/issues/127)) ([710f705](https://github.com/juspay/hyperswitch-web/commit/710f705f738a0c805847a3b596e83d449486d704))
+
+
+### Features
+
+* HS-2222: Dynamic fields support for IDeal, Sofort and Eps ([#125](https://github.com/juspay/hyperswitch-web/issues/125)) ([789ecb9](https://github.com/juspay/hyperswitch-web/commit/789ecb99ffff4c9ee9ffe55af501ba8953c667b7))
+
 ## [0.20.5](https://github.com/juspay/hyperswitch-web/compare/v0.20.4...v0.20.5) (2024-01-24)
 
 
