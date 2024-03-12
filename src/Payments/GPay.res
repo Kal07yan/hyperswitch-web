@@ -33,6 +33,8 @@ let make = (
 
   let areOneClickWalletsRendered = Recoil.useSetRecoilState(RecoilAtoms.areOneClickWalletsRendered)
 
+  let isGuestCustomer = UtilityHooks.useIsGuestCustomer()
+
   let googlePayPaymentMethodType = switch PaymentMethodsRecord.getPaymentMethodTypeFromList(
     ~list,
     ~paymentMethod="wallet",
@@ -43,10 +45,10 @@ let make = (
   }
 
   let isWallet = walletOptions->Js.Array2.includes("google_pay")
-  let paymentExperience =
-    googlePayPaymentMethodType.payment_experience->Js.Array2.length == 0
-      ? PaymentMethodsRecord.RedirectToURL
-      : googlePayPaymentMethodType.payment_experience[0].payment_experience_type
+  let paymentExperience = switch googlePayPaymentMethodType.payment_experience[0] {
+  | Some(paymentExperience) => paymentExperience.payment_experience_type
+  | None => PaymentMethodsRecord.RedirectToURL
+  }
 
   let isInvokeSDKFlow = React.useMemo1(() => {
     (isGooglePaySDKFlow || isGooglePayThirdPartyFlow) &&
@@ -87,8 +89,14 @@ let make = (
       if dict->Js.Dict.get("gpayResponse")->Belt.Option.isSome {
         let metadata = dict->getJsonObjectFromDict("gpayResponse")
         let obj = metadata->getDictFromJson->itemToObjMapper
+        let gPayBody = PaymentUtils.appendedCustomerAcceptance(
+          ~isGuestCustomer,
+          ~paymentType=list.payment_type,
+          ~body=PaymentBody.gpayBody(~payObj=obj, ~connectors),
+        )
+
         let body = {
-          PaymentBody.gpayBody(~payObj=obj, ~connectors)
+          gPayBody
           ->Js.Dict.fromArray
           ->Js.Json.object_
           ->OrcaUtils.flattenObject(true)

@@ -16,7 +16,6 @@ type style
 @get external value: Dom.element => 'a = "value"
 @val @scope(("window", "location"))
 external replace: string => unit = "replace"
-@val @scope(("window", "parent", "location")) external href: string = "href"
 
 @val @scope("document") external createElement: string => Dom.element = "createElement"
 @set external windowOnload: (window, unit => unit) => unit = "onload"
@@ -59,6 +58,7 @@ external style: Dom.element => style = "style"
 @set external setTransition: (style, string) => unit = "transition"
 @set external setHeight: (style, string) => unit = "height"
 @send external paymentRequest: (Js.Json.t, Js.Json.t, Js.Json.t) => Js.Json.t = "PaymentRequest"
+@send external click: Dom.element => unit = "click"
 
 let iframePostMessage = (iframeRef: Js.nullable<Dom.element>, message) => {
   switch iframeRef->Js.Nullable.toOption {
@@ -125,3 +125,11 @@ let isSandbox = hostname === "beta.hyperswitch.io"
 let isInteg = hostname === "dev.hyperswitch.io"
 
 let isProd = hostname === "checkout.hyperswitch.io"
+
+module Location = {
+  @val @scope(("window", "location")) external replace: (. string) => unit = "replace"
+}
+
+module Element = {
+  @get external clientWidth: Dom.element => int = "clientWidth"
+}

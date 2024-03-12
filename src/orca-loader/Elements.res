@@ -159,8 +159,6 @@ let make = (
           }
           let msg = [("paymentMethodList", json)]->Js.Dict.fromArray
           mountedIframeRef->Window.iframePostMessage(msg)
-          let maskedPayload = json->getDictFromJson->PaymentHelpers.maskPayload
-          logger.setLogInfo(~value=maskedPayload, ~eventName=PAYMENT_METHODS_RESPONSE, ())
         }
       }
       let msg = [("sendPaymentMethodsResponse", true->Js.Json.boolean)]->Js.Dict.fromArray
@@ -256,9 +254,8 @@ let make = (
       let mountPostMessage = (
         mountedIframeRef,
         selectorString,
-        sdkHandleConfirmPayment,
         sdkHandleOneClickConfirmPayment,
-        disableSaveCards,
+        displaySavedPaymentMethods,
       ) => {
         open Promise
 
@@ -283,7 +280,6 @@ let make = (
             ("publishableKey", publishableKey->Js.Json.string),
             ("endpoint", endpoint->Js.Json.string),
             ("sdkSessionId", sdkSessionId->Js.Json.string),
-            ("sdkHandleConfirmPayment", sdkHandleConfirmPayment->Js.Json.boolean),
             ("blockConfirm", blockConfirm->Js.Json.boolean),
             ("switchToCustomPod", switchToCustomPod->Js.Json.boolean),
             ("endpoint", endpoint->Js.Json.string),
@@ -777,7 +773,9 @@ let make = (
         preMountLoaderMountedPromise
         ->then(_ => {
           fetchPaymentsList(mountedIframeRef)
-          fetchCustomerPaymentMethods(mountedIframeRef, disableSaveCards)
+          if displaySavedPaymentMethods {
+            fetchCustomerPaymentMethods(mountedIframeRef, !displaySavedPaymentMethods)
+          }
           fetchSessionTokens(mountedIframeRef)
           mountedIframeRef->Window.iframePostMessage(message)
           resolve()

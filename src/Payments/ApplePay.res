@@ -38,9 +38,10 @@ let make = (
   }, [list])
 
   let paymentExperience = React.useMemo1(() => {
-    applePayPaymentMethodType.payment_experience->Js.Array2.length == 0
-      ? PaymentMethodsRecord.RedirectToURL
-      : applePayPaymentMethodType.payment_experience[0].payment_experience_type
+    switch applePayPaymentMethodType.payment_experience[0] {
+    | Some(paymentExperience) => paymentExperience.payment_experience_type
+    | None => PaymentMethodsRecord.RedirectToURL
+    }
   }, [applePayPaymentMethodType])
 
   let isInvokeSDKFlow = React.useMemo1(() => {
@@ -51,10 +52,18 @@ let make = (
     ? list->PaymentUtils.getConnectors(Wallets(ApplePay(SDK)))
     : list->PaymentUtils.getConnectors(Wallets(ApplePay(Redirect)))
 
+  let isGuestCustomer = UtilityHooks.useIsGuestCustomer()
+
   let processPayment = bodyArr => {
+    let requestBody = PaymentUtils.appendedCustomerAcceptance(
+      ~isGuestCustomer,
+      ~paymentType=list.payment_type,
+      ~body=bodyArr,
+    )
+
     if isWallet {
       intent(
-        ~bodyArr,
+        ~bodyArr=requestBody,
         ~confirmParam={
           return_url: options.wallets.walletReturnUrl,
           publishableKey,

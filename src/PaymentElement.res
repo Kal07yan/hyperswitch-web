@@ -1,6 +1,6 @@
 open PaymentType
 open RecoilAtoms
-open PaymentModeType
+
 let cardsToRender = (width: int) => {
   let minWidth = 130
   let noOfCards = (width - 40) / minWidth
@@ -14,10 +14,15 @@ let make = (
   ~countryProps,
   ~paymentType: CardThemeType.mode,
 ) => {
+  let {localeString} = Recoil.useRecoilValueFromAtom(RecoilAtoms.configAtom)
   let sessionsObj = Recoil.useRecoilValueFromAtom(sessions)
-  let {showCardFormByDefault, paymentMethodOrder, layout} = Recoil.useRecoilValueFromAtom(
-    optionAtom,
-  )
+  let {
+    showCardFormByDefault,
+    paymentMethodOrder,
+    layout,
+    customerPaymentMethods,
+    displaySavedPaymentMethodsCheckbox,
+  } = Recoil.useRecoilValueFromAtom(optionAtom)
   let isApplePayReady = Recoil.useRecoilValueFromAtom(isApplePayReady)
   let isGooglePayReady = Recoil.useRecoilValueFromAtom(isGooglePayReady)
   let methodslist = Recoil.useRecoilValueFromAtom(list)
@@ -25,7 +30,7 @@ let make = (
   let (sessions, setSessions) = React.useState(_ => Js.Dict.empty()->Js.Json.object_)
   let (paymentOptions, setPaymentOptions) = React.useState(_ => [])
   let (walletOptions, setWalletOptions) = React.useState(_ => [])
-  let {sdkHandleConfirmPayment} = Recoil.useRecoilValueFromAtom(keys)
+  let {sdkHandleConfirmPayment} = Recoil.useRecoilValueFromAtom(optionAtom)
 
   let (list, setList) = React.useState(_ => PaymentMethodsRecord.defaultList)
   let (cardsContainerWidth, setCardsContainerWidth) = React.useState(_ => 0)
@@ -36,10 +41,78 @@ let make = (
   let loggerState = Recoil.useRecoilValueFromAtom(loggerAtom)
   let isShowOrPayUsing = Recoil.useRecoilValueFromAtom(isShowOrPayUsing)
 
+  let (showFields, setShowFields) = Recoil.useRecoilState(RecoilAtoms.showCardFieldsAtom)
+  let (paymentToken, setPaymentToken) = Recoil.useRecoilState(RecoilAtoms.paymentTokenAtom)
+  let (savedMethods, setSavedMethods) = React.useState(_ => [])
+  let (
+    loadSavedCards: PaymentType.savedCardsLoadState,
+    setLoadSavedCards: (PaymentType.savedCardsLoadState => PaymentType.savedCardsLoadState) => unit,
+  ) = React.useState(_ => PaymentType.LoadingSavedCards)
+
+  React.useEffect2(() => {
+    switch (displaySavedPaymentMethodsCheckbox, customerPaymentMethods) {
+    | (false, _) => {
+        setShowFields(._ => true)
+        setLoadSavedCards(_ => LoadedSavedCards([], true))
+      }
+    | (_, LoadingSavedCards) => ()
+    | (_, LoadedSavedCards(savedPaymentMethods, isGuestCustomer)) => {
+        let defaultPaymentMethod =
+          savedPaymentMethods->Js.Array2.find(savedCard => savedCard.defaultPaymentMethodSet)
+
+        let savedCardsWithoutDefaultPaymentMethod =
+          savedPaymentMethods->Js.Array2.filter(savedCard => {
+            !savedCard.defaultPaymentMethodSet
+          })
+
+        let finalSavedPaymentMethods = switch defaultPaymentMethod {
+        | Some(defaultPaymentMethod) =>
+          [defaultPaymentMethod]->Js.Array2.concat(savedCardsWithoutDefaultPaymentMethod)
+        | None => savedCardsWithoutDefaultPaymentMethod
+        }
+
+        setSavedMethods(_ => finalSavedPaymentMethods)
+        setLoadSavedCards(_ =>
+          finalSavedPaymentMethods->Js.Array2.length == 0
+            ? NoResult(isGuestCustomer)
+            : LoadedSavedCards(finalSavedPaymentMethods, isGuestCustomer)
+        )
+        setShowFields(.prev => finalSavedPaymentMethods->Js.Array2.length == 0 || prev)
+      }
+    | (_, NoResult(isGuestCustomer)) => {
+        setLoadSavedCards(_ => NoResult(isGuestCustomer))
+        setShowFields(._ => true)
+      }
+    }
+
+    None
+  }, (customerPaymentMethods, displaySavedPaymentMethodsCheckbox))
+
+  React.useEffect1(() => {
+    let defaultPaymentMethod =
+      savedMethods->Js.Array2.find(savedMethod => savedMethod.defaultPaymentMethodSet)
+
+    let isSavedMethodsEmpty = savedMethods->Js.Array2.length === 0
+
+    let tokenObj = switch (isSavedMethodsEmpty, defaultPaymentMethod) {
+    | (false, Some(defaultPaymentMethod)) => Some(defaultPaymentMethod)
+    | (false, None) =>
+      Some(savedMethods->Belt.Array.get(0)->Belt.Option.getWithDefault(defaultCustomerMethods))
+    | _ => None
+    }
+
+    switch tokenObj {
+    | Some(obj) => setPaymentToken(._ => (obj.paymentToken, obj.customerId))
+    | None => ()
+    }
+    None
+  }, [savedMethods])
+
   let (walletList, paymentOptionsList, actualList) = React.useMemo4(() => {
     switch methodslist {
     | Loaded(paymentlist) =>
-      let paymentOrder = paymentOrder->Js.Array2.length > 0 ? paymentOrder : defaultOrder
+      let paymentOrder =
+        paymentOrder->Js.Array2.length > 0 ? paymentOrder : PaymentModeType.defaultOrder
       let plist = paymentlist->Utils.getDictFromJson->PaymentMethodsRecord.itemToObjMapper
       let (wallets, otherOptions) =
         plist->PaymentUtils.paymentListLookupNew(
@@ -90,7 +163,7 @@ let make = (
             )
           }
         : ()
-    | LoadError
+    | LoadError(_)
     | SemiLoaded =>
       setPaymentOptions(_ =>
         showCardFormByDefault && Utils.checkPriorityList(paymentMethodOrder) ? ["card"] : []
@@ -143,7 +216,7 @@ let make = (
         ? ""
         : switch methodslist {
           | SemiLoaded
-          | LoadError =>
+          | LoadError(_) =>
             showCardFormByDefault && Utils.checkPriorityList(paymentMethodOrder) ? "card" : ""
           | Loaded(_) =>
             paymentOptions->Js.Array2.includes(selectedOption) && showCardFormByDefault
@@ -203,7 +276,7 @@ let make = (
   }
   let checkoutEle = {
     <ErrorBoundary key={selectedOption}>
-      {switch selectedOption->paymentMode {
+      {switch selectedOption->PaymentModeType.paymentMode {
       | Card => <CardPayment cardProps expiryProps cvcProps paymentType list />
       | Klarna =>
         <SessionPaymentWrapper type_=Others>
@@ -284,6 +357,10 @@ let make = (
           <ApplePayLazy sessionObj=optToken list walletOptions paymentType />
         | _ => React.null
         }
+      | Boleto =>
+        <React.Suspense fallback={loader()}>
+          <BoletoLazy paymentType list />
+        </React.Suspense>
       | _ =>
         <React.Suspense fallback={loader()}>
           <PaymentMethodsWrapperLazy paymentType list paymentMethodName=selectedOption />
@@ -291,9 +368,21 @@ let make = (
       }}
     </ErrorBoundary>
   }
+
+  let paymentLabel = showFields
+    ? localeString.selectPaymentMethodLabel
+    : localeString.savedPaymentMethodsLabel
+
   <>
+    <div className="text-2xl font-semibold text-[#151619] mb-6"> {React.string(paymentLabel)} </div>
+    <RenderIf condition={!showFields}>
+      <SavedMethods
+        paymentToken setPaymentToken savedMethods loadSavedCards cvcProps paymentType list
+      />
+    </RenderIf>
     <RenderIf
-      condition={paymentOptions->Js.Array2.length > 0 || walletOptions->Js.Array2.length > 0}>
+      condition={(paymentOptions->Js.Array2.length > 0 || walletOptions->Js.Array2.length > 0) &&
+        showFields}>
       <div className="flex flex-col place-items-center">
         <ErrorBoundary key="payment_request_buttons_all" level={ErrorBoundary.RequestButton}>
           <PaymentRequestButtonElement sessions walletOptions list />
@@ -312,15 +401,20 @@ let make = (
         | Accordion => <AccordionContainer paymentOptions checkoutEle />
         }}
       </div>
-      <RenderIf condition={sdkHandleConfirmPayment}>
-        <div className="mt-4">
-          <PayNowButton />
-        </div>
-      </RenderIf>
-      <PoweredBy />
     </RenderIf>
+    <RenderIf condition={sdkHandleConfirmPayment.handleConfirm}>
+      <div className="mt-4">
+        <PayNowButton
+          cvcProps
+          cardProps
+          expiryProps
+          selectedOption={selectedOption->PaymentModeType.paymentMode}
+        />
+      </div>
+    </RenderIf>
+    <PoweredBy />
     {switch methodslist {
-    | LoadError => React.null
+    | LoadError(_) => React.null
     | _ =>
       <RenderIf
         condition={paymentOptions->Js.Array2.length == 0 && walletOptions->Js.Array2.length == 0}>

@@ -29,7 +29,7 @@ if (
       Window.body->Window.appendChild(script)
     })
   } catch {
-  | e => Js.log("Sentry load exited")
+  | e => Js.log2("Sentry load exited", e)
   }
 }
 
@@ -186,7 +186,7 @@ let make = (publishableKey, options: option<Js.Json.t>, analyticsInfo: option<Js
           "api-key": publishableKey,
         }
         let endpoint = ApiEndpoint.getApiEndPoint(~publishableKey, ())
-        let paymentIntentID = Js.String2.split(clientSecret, "_secret_")[0]
+        let paymentIntentID = Js.String2.split(clientSecret, "_secret_")[0]->Option.getOr("")
         let retrievePaymentUrl = `${endpoint}/payments/${paymentIntentID}?client_secret=${clientSecret}`
         open Promise
         logApi(
@@ -198,9 +198,12 @@ let make = (publishableKey, options: option<Js.Json.t>, analyticsInfo: option<Js
           ~logCategory=API,
           (),
         )
-        Fetch.fetchWithInit(
+        Fetch.fetch(
           retrievePaymentUrl,
-          Fetch.RequestInit.make(~method_=Fetch.Get, ~headers=Fetch.HeadersInit.make(headers), ()),
+          {
+            method: #GET,
+            headers: Fetch.Headers.fromObject(headers),
+          },
         )
         ->then(resp => {
           let statusCode = resp->Fetch.Response.status->string_of_int
@@ -338,6 +341,17 @@ let make = (publishableKey, options: option<Js.Json.t>, analyticsInfo: option<Js
       let confirmOneClickPayment = (payload, result: bool) => {
         confirmPaymentWrapper(payload, true, result)
       }
+
+      let handleSdkConfirm = (event: Types.event) => {
+        let json = event.data->eventToJson
+        let dict = json->getDictFromJson
+        switch dict->Js.Dict.get("handleSdkConfirm") {
+        | Some(payload) => confirmPayment(payload)->ignore
+        | None => ()
+        }
+      }
+
+      addSmartEventListener("message", handleSdkConfirm, "handleSdkConfirm")
 
       let elements = elementsOptions => {
         open Promise
@@ -488,6 +502,34 @@ let make = (publishableKey, options: option<Js.Json.t>, analyticsInfo: option<Js
         Window.paymentRequest(methodData, details, optionsForPaymentRequest)
       }
 
+      let initPaymentSession = paymentSessionOptions => {
+        open Promise
+
+        let clientSecretId =
+          paymentSessionOptions
+          ->Js.Json.decodeObject
+          ->Belt.Option.flatMap(x => x->Js.Dict.get("clientSecret"))
+          ->Belt.Option.flatMap(Js.Json.decodeString)
+          ->Belt.Option.getWithDefault("")
+        clientSecret := clientSecretId
+        Js.Promise.make((~resolve, ~reject as _) => {
+          logger.setClientSecret(clientSecretId)
+          resolve(. Js.Json.null)
+        })
+        ->then(_ => {
+          logger.setLogInfo(~value=Window.href, ~eventName=PAYMENT_SESSION_INITIATED, ())
+          resolve()
+        })
+        ->ignore
+
+        PaymentSession.make(
+          paymentSessionOptions,
+          ~clientSecret={clientSecretId},
+          ~publishableKey,
+          ~logger=Some(logger),
+        )
+      }
+
       let returnObject = {
         confirmOneClickPayment,
         confirmPayment,
@@ -496,6 +538,7 @@ let make = (publishableKey, options: option<Js.Json.t>, analyticsInfo: option<Js
         confirmCardPayment: confirmCardPaymentFn,
         retrievePaymentIntent: retrievePaymentIntentFn,
         paymentRequest,
+        initPaymentSession,
       }
       Window.setHyper(Window.window, returnObject)
       returnObject

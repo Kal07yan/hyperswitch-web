@@ -25,6 +25,7 @@ let make = () => {
         <FullScreenDivDriver />
       </div>
     | "qrData" => <QRCodeDisplay />
+    | "voucherData" => <VoucherDisplay />
     | "preMountLoader" => {
         let clientSecret = CardUtils.getQueryParamsDictforKey(url.search, "clientSecret")
         let sessionId = CardUtils.getQueryParamsDictforKey(url.search, "sessionId")

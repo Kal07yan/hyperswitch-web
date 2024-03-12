@@ -61,6 +61,12 @@ type localeStrings = {
   nameEmptyText: string => string,
   completeNameEmptyText: string => string,
   billingDetailsText: string,
+  socialSecurityNumberLabel: string,
+  saveWalletDetails: string,
+  morePaymentMethods: string,
+  useExistingPaymentMethods: string,
+  selectPaymentMethodLabel: string,
+  savedPaymentMethodsLabel: string,
 }
 
 let defaultLocale = {
@@ -137,6 +143,12 @@ let defaultLocale = {
   nameEmptyText: str => `Please provide your ${str}`,
   completeNameEmptyText: str => `Please provide your complete ${str}`,
   billingDetailsText: "Billing Details",
+  socialSecurityNumberLabel: "Social Security Number",
+  saveWalletDetails: "Wallets details will be saved upon selection",
+  morePaymentMethods: "More payment methods",
+  useExistingPaymentMethods: "Use saved payment methods",
+  selectPaymentMethodLabel: "Select Payment Method",
+  savedPaymentMethodsLabel: "Saved Payment Methods",
 }
 
 type locale = {localeStrings: array<localeStrings>}
@@ -182,7 +194,7 @@ let localeStrings = [
     useExisitingSavedCards: "Use saved debit/credit cards",
     saveCardDetails: "Save card details",
     addBankAccount: "Add bank account",
-    achBankDebitTerms: str =>
+    achBankDebitTerms: _ =>
       `Your ACH Debit Authorization will be set up now, but we'll confirm the amount and let you know before future payments are taken.`,
     sepaDebitTerms: str =>
       `By providing your payment information and confirming this payment, you authorise (A) ${str} and Hyperswitch, our payment service provider and/or PPRO, its local service provider, to send instructions to your bank to debit your account and (B) your bank to debit your account in accordance with those instructions. As part of your rights, you are entitled to a refund from your bank under the terms and conditions of your agreement with your bank. A refund must be claimed within 8 weeks starting from the date on which your account was debited. Your rights are explained in a statement that you can obtain from your bank. You agree to receive notifications for future debits up to 2 days before they occur.`,
@@ -215,6 +227,12 @@ let localeStrings = [
     nameEmptyText: str => `Please provide your ${str}`,
     completeNameEmptyText: str => `Please provide your complete ${str}`,
     billingDetailsText: "Billing Details",
+    socialSecurityNumberLabel: "Social Security Number",
+    saveWalletDetails: "Wallets details will be saved upon selection",
+    morePaymentMethods: "More payment methods",
+    useExistingPaymentMethods: "Use saved payment methods",
+    selectPaymentMethodLabel: "Select Payment Method",
+    savedPaymentMethodsLabel: "Saved Payment Methods",
   },
   {
     locale: "he",
@@ -290,6 +308,12 @@ let localeStrings = [
     nameEmptyText: str => `אנא ספק את שלך ${str}`,
     completeNameEmptyText: str => `אנא ספק את המלא שלך ${str}`,
     billingDetailsText: `פרטי תשלום`,
+    socialSecurityNumberLabel: `מספר ביטוח לאומי`,
+    saveWalletDetails: "פרטי הארנק יישמרו בעת בחירה",
+    morePaymentMethods: `אמצעי תשלום נוספים`,
+    useExistingPaymentMethods: `השתמש באמצעי תשלום שמורים`,
+    selectPaymentMethodLabel: `בחר שיטת תשלום`,
+    savedPaymentMethodsLabel: `אמצעי תשלום שמורים`,
   },
   {
     locale: `fr`,
@@ -364,7 +388,13 @@ let localeStrings = [
     \"and": `et`,
     nameEmptyText: str => `Veuillez fournir votre ${str}`,
     completeNameEmptyText: str => `Veuillez fournir votre complet ${str}`,
-    billingDetailsText: "Détails de la facturation",
+    billingDetailsText: `Détails de la facturation`,
+    socialSecurityNumberLabel: `Numéro de sécurité sociale`,
+    saveWalletDetails: "Les détails du portefeuille seront enregistrés lors de la sélection",
+    morePaymentMethods: `Plus de méthodes de paiement`,
+    useExistingPaymentMethods: `Utiliser les modes de paiement enregistrés`,
+    selectPaymentMethodLabel: `Sélectionnez le mode de paiement`,
+    savedPaymentMethodsLabel: `Modes de paiement enregistrés`,
   },
   {
     locale: "en-GB",
@@ -407,7 +437,7 @@ let localeStrings = [
     useExisitingSavedCards: "Use saved debit/credit cards",
     saveCardDetails: "Save card details",
     addBankAccount: "Add bank account",
-    achBankDebitTerms: str =>
+    achBankDebitTerms: _ =>
       `Your ACH Debit Authorization will be set up now, but we'll confirm the amount and let you know before future payments are taken.`,
     sepaDebitTerms: str =>
       `By providing your payment information and confirming this payment, you authorise (A) ${str} and Hyperswitch, our payment service provider and/or PPRO, its local service provider, to send instructions to your bank to debit your account and (B) your bank to debit your account in accordance with those instructions. As part of your rights, you are entitled to a refund from your bank under the terms and conditions of your agreement with your bank. A refund must be claimed within 8 weeks starting from the date on which your account was debited. Your rights are explained in a statement that you can obtain from your bank. You agree to receive notifications for future debits up to 2 days before they occur.`,
@@ -440,6 +470,12 @@ let localeStrings = [
     nameEmptyText: str => `Please provide your ${str}`,
     completeNameEmptyText: str => `Please provide your complete ${str}`,
     billingDetailsText: "Billing Details",
+    socialSecurityNumberLabel: "Social Security Number",
+    saveWalletDetails: "Wallets details will be saved upon selection",
+    morePaymentMethods: "More payment methods",
+    useExistingPaymentMethods: "Use saved payment methods",
+    selectPaymentMethodLabel: "Select Payment Method",
+    savedPaymentMethodsLabel: "Saved Payment Methods",
   },
   {
     locale: "ar",
@@ -515,6 +551,12 @@ let localeStrings = [
     nameEmptyText: str => `يرجى تقديم الخاص بك ${str}`,
     completeNameEmptyText: str => `يرجى تقديم كامل الخاص بك ${str}`,
     billingDetailsText: `تفاصيل الفاتورة`,
+    socialSecurityNumberLabel: `رقم الضمان الاجتماعي`,
+    saveWalletDetails: "سيتم حفظ تفاصيل المحفظة عند الاختيار",
+    morePaymentMethods: `المزيد من طرق الدفع`,
+    useExistingPaymentMethods: `استخدم طرق الدفع المحفوظة`,
+    selectPaymentMethodLabel: `اختار طريقة الدفع`,
+    savedPaymentMethodsLabel: `طرق الدفع المحفوظة`,
   },
   {
     locale: "ja",
@@ -590,6 +632,12 @@ let localeStrings = [
     nameEmptyText: str => `あなたの情報を提供してください ${str}`,
     completeNameEmptyText: str => `完全な情報を提供してください ${str}`,
     billingDetailsText: `支払明細`,
+    socialSecurityNumberLabel: `社会保障番号`,
+    saveWalletDetails: "選択時にウォレットの詳細が保存されます",
+    morePaymentMethods: `その他の支払い方法`,
+    useExistingPaymentMethods: `保存した支払い方法を使用する`,
+    selectPaymentMethodLabel: `支払い方法を選択してください`,
+    savedPaymentMethodsLabel: `保存された支払い方法`,
   },
   {
     locale: "de",
@@ -665,5 +713,11 @@ let localeStrings = [
     nameEmptyText: str => `Bitte geben Sie Ihre an ${str}`,
     completeNameEmptyText: str => `Bitte geben Sie Ihr vollständiges Formular an ${str}`,
     billingDetailsText: `Rechnungsdetails`,
+    socialSecurityNumberLabel: `Sozialversicherungsnummer`,
+    saveWalletDetails: "Wallet-Details werden beim Auswählen gespeichert",
+    morePaymentMethods: `Mehr Zahlungsmethoden`,
+    useExistingPaymentMethods: `Gespeicherte Zahlungsarten nutzen`,
+    selectPaymentMethodLabel: `Wählen Sie die Zahlungsmethode`,
+    savedPaymentMethodsLabel: `Gespeicherte Zahlungsarten`,
   },
 ]

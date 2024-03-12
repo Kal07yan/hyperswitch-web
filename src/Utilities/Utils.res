@@ -57,6 +57,26 @@ let getInt = (dict, key, default: int) => {
   ->Belt.Float.toInt
 }
 
+let getFloatFromString = (str, default) => {
+  let val = str->Js.Float.fromString
+  val->Js.Float.isNaN ? default : val
+}
+
+let getFloatFromJson = (json, default) => {
+  switch json->Js.Json.classify {
+  | JSONString(str) => getFloatFromString(str, default)
+  | JSONNumber(floatValue) => floatValue
+  | _ => default
+  }
+}
+
+let getFloat = (dict, key, default) => {
+  dict
+  ->Js.Dict.get(key)
+  ->Belt.Option.map(json => getFloatFromJson(json, default))
+  ->Belt.Option.getWithDefault(default)
+}
+
 let getJsonBoolValue = (dict, key, default) => {
   dict->Js.Dict.get(key)->Belt.Option.getWithDefault(default->Js.Json.boolean)
 }
@@ -83,6 +103,14 @@ let getDecodedStringFromJson = (json, callbackFunc, defaultValue) => {
   ->Js.Json.decodeObject
   ->Belt.Option.flatMap(callbackFunc)
   ->Belt.Option.flatMap(Js.Json.decodeString)
+  ->Belt.Option.getWithDefault(defaultValue)
+}
+
+let getDecodedBoolFromJson = (json, callbackFunc, defaultValue) => {
+  json
+  ->Js.Json.decodeObject
+  ->Belt.Option.flatMap(callbackFunc)
+  ->Belt.Option.flatMap(Js.Json.decodeBoolean)
   ->Belt.Option.getWithDefault(defaultValue)
 }
 
@@ -128,6 +156,10 @@ let getOptionBool = (dict, key) => {
 }
 let getDictFromJson = (json: Js.Json.t) => {
   json->Js.Json.decodeObject->Belt.Option.getWithDefault(Js.Dict.empty())
+}
+
+let getDictfromDict = (dict, key) => {
+  dict->getJsonObjectFromDict(key)->getDictFromJson
 }
 
 let getBool = (dict, key, default) => {
@@ -208,11 +240,7 @@ let handleMessage = (fun, _errorMessage) => {
     }
   }
   Window.addEventListener("message", handle)
-  Some(
-    () => {
-      Window.removeEventListener("message", handle)
-    },
-  )
+  Some(() => Window.removeEventListener("message", handle))
 }
 let submitPaymentData = callback => {
   React.useEffect1(() => {handleMessage(callback, "")}, [callback])
@@ -275,6 +303,19 @@ let postSubmitResponse = (~jsonData, ~url) => {
     ("data", jsonData),
     ("url", url->Js.Json.string),
   ])
+}
+
+let getFailedSubmitResponse = (~errorType, ~message) => {
+  [
+    (
+      "error",
+      [("type", errorType->Js.Json.string), ("message", message->Js.Json.string)]
+      ->Js.Dict.fromArray
+      ->Js.Json.object_,
+    ),
+  ]
+  ->Js.Dict.fromArray
+  ->Js.Json.object_
 }
 
 let toCamelCase = str => {
@@ -408,16 +449,15 @@ let validatePhoneNumber = (countryCode, number) => {
     ->Belt.Option.flatMap(Js.Json.decodeString)
     ->Belt.Option.getWithDefault("") == countryCode
   })
-  if filteredArr->Js.Array2.length > 0 {
-    let obj = filteredArr[0]
+  switch filteredArr[0] {
+  | Some(obj) =>
     let regex =
       obj
       ->Js.Dict.get("validation_regex")
       ->Belt.Option.flatMap(Js.Json.decodeString)
       ->Belt.Option.getWithDefault("")
     Js.Re.test_(regex->Js.Re.fromString, number)
-  } else {
-    false
+  | None => false
   }
 }
 
@@ -619,11 +659,12 @@ let validateRountingNumber = str => {
   if str->Js.String2.length != 9 {
     false
   } else {
-    let weights = [3, 7, 1, 3, 7, 1, 3, 7, 1]
+    let firstWeight = 3
+    let weights = [firstWeight, 7, 1, 3, 7, 1, 3, 7, 1]
     let sum =
       str
       ->Js.String2.split("")
-      ->Js.Array2.mapi((item, i) => item->toInt * weights[i])
+      ->Js.Array2.mapi((item, i) => item->toInt * weights[i]->Option.getOr(firstWeight))
       ->Js.Array2.reduce((acc, val) => {
         acc + val
       }, 0)
@@ -792,25 +833,23 @@ let getHeaders = (~uri=?, ~token=?, ~headers=Js.Dict.empty(), ()) => {
     let (x, val) = entries
     Js.Dict.set(headerObj, x, val)
   })
-  Fetch.HeadersInit.make(headerObj->dictToObj)
+  Fetch.Headers.fromObject(headerObj->dictToObj)
 }
-let fetchApi = (
-  uri,
-  ~bodyStr: string="",
-  ~headers=Js.Dict.empty(),
-  ~method_: Fetch.requestMethod,
-  (),
-) => {
+let fetchApi = (uri, ~bodyStr: string="", ~headers=Js.Dict.empty(), ~method: Fetch.method, ()) => {
   open Promise
-  let body = switch method_ {
-  | Get => resolve(None)
-  | _ => resolve(Some(Fetch.BodyInit.make(bodyStr)))
+  let body = switch method {
+  | #GET => resolve(None)
+  | _ => resolve(Some(Fetch.Body.string(bodyStr)))
   }
 
   body->then(body => {
-    Fetch.fetchWithInit(
+    Fetch.fetch(
       uri,
-      Fetch.RequestInit.make(~method_, ~body?, ~headers=getHeaders(~headers, ~uri, ()), ()),
+      {
+        method,
+        ?body,
+        headers: getHeaders(~headers, ~uri, ()),
+      },
     )
     ->catch(err => {
       reject(err)
@@ -849,3 +888,9 @@ let isOtherElements = componentType => {
 }
 
 let nbsp = `\u00A0`
+
+let callbackFuncForExtractingValFromDict = key => {
+  x => x->Js.Dict.get(key)
+}
+
+let brandIconSize = 28
